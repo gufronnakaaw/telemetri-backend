@@ -31,4 +31,5 @@ jobs:
             git status
             npm install
             npm run build
+            npx prisma generate
             pm2 restart telemetri-backend
