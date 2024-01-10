@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Token {
+  id                Int          @id @default(autoincrement())
+  token             String       @db.VarChar(255) 
+  created_at        DateTime     @default(now())
+
+  @@map("tokens")
+}
+
+model Station {
+  id                Int          @id @default(autoincrement())
+  name              String       @db.VarChar(255) @unique
+  title             String       @db.VarChar(255)
+  status            Status       @default(active)
+  lat               String       @db.VarChar(255) 
+  long              String       @db.VarChar(255)
+  created_at        DateTime     @default(now())
+  
+  telemetry         Telemetry[]
+  @@map("stations")
+}
+
+model Telemetry {
+  id                Int          @id @default(autoincrement())
+  time              String?      @db.VarChar(255)
+  ac_voltage        String?      @db.VarChar(255)
+  ac_current        String?      @db.VarChar(255)
+  power             String?      @db.VarChar(255)
+  energy            String?      @db.VarChar(255)
+  frequency         String?      @db.VarChar(255)
+  pf                String?      @db.VarChar(255)
+  dc_voltage        String?      @db.VarChar(255)
+  dc_current        String?      @db.VarChar(255)
+  suhu              String?      @db.VarChar(255)
+  kelembapan_air    String?      @db.VarChar(255)
+  water_flow        String?      @db.VarChar(255)
+  ketinggian_air    String?      @db.VarChar(255)
+  volume_air        String?      @db.VarChar(255)
+  station_name      String?
+  created_at        DateTime     @default(now())
+
+  station           Station?     @relation(fields: [station_name], references: [name])
+  @@map("telemetry")
+}
+
+model User {
+  id                Int           @id @default(autoincrement())
+  email             String        @db.VarChar(255)
+  fullname          String        @db.VarChar(255)
+  password          String        @db.VarChar(255)
+  role              UserEnum
+  created_at        DateTime      @default(now())
+
+  @@map("users")
+}
+
+enum UserEnum {
+  admin
+  user
+}
+
+enum Status {
+  active
+  inactive
+}
