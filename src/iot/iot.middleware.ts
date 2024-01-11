@@ -7,10 +7,31 @@ export class IotMiddleware implements NestMiddleware {
   constructor(private prisma: PrismaService) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
-    if (req.headers.token) {
+    if (req.query.token) {
+      const { token } = req.query as { token: string };
+
       const check = await this.prisma.token.count({
         where: {
-          token: req.header('token'),
+          token,
+        },
+      });
+
+      if (!check) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          success: false,
+          message: 'Unauthorized',
+        });
+      }
+
+      delete req.query.token;
+
+      return next();
+    }
+
+    if (req.body.token) {
+      const check = await this.prisma.token.count({
+        where: {
+          token: req.body.token,
         },
       });
 
@@ -24,10 +45,10 @@ export class IotMiddleware implements NestMiddleware {
       return next();
     }
 
-    if (req.body.token) {
+    if (req.headers.token) {
       const check = await this.prisma.token.count({
         where: {
-          token: req.body.token,
+          token: req.header('token'),
         },
       });
 
