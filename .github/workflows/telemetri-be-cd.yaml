@@ -30,6 +30,6 @@ jobs:
             git pull origin main
             git status
             npm install
-            npm run build
             npx prisma generate
+            npm run build
             pm2 restart telemetri-backend
