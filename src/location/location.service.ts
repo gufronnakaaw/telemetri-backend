@@ -20,17 +20,7 @@ export class LocationService {
     });
   }
 
-  async getDetail(name: string) {
-    const check = await this.prisma.telemetry.count({
-      where: {
-        station_name: name,
-      },
-    });
-
-    if (check < 1) {
-      throw new CustomError(404, 'name not found');
-    }
-
+  getDetail(name: string) {
     return this.prisma.telemetry.findMany({
       where: {
         station_name: name,
