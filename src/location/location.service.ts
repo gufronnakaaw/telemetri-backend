@@ -25,6 +25,9 @@ export class LocationService {
       where: {
         station_name: name,
       },
+      orderBy: {
+        created_at: 'desc',
+      },
     });
   }
 
