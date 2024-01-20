@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-import { CustomException } from 'src/errors/custom.exception';
+import { CustomException } from '../errors/custom.exception';
 import { CreateTelemetryDto } from './iot.dto';
 import { IotService } from './iot.service';
 

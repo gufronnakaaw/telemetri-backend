@@ -1,6 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { CustomException } from 'src/errors/custom.exception';
-import { CreateLocationDto, DeleteLocationDto } from './location.dto';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
+import { CustomException } from '../errors/custom.exception';
+import {
+  CreateLocationDto,
+  DeleteLocationDto,
+  UpdateLocationDto,
+} from './location.dto';
 import { LocationService } from './location.service';
 
 @Controller('location')
@@ -57,6 +69,20 @@ export class LocationController {
       return {
         success: true,
         message: 'the location has been deleted',
+      };
+    } catch (error) {
+      throw new CustomException(error);
+    }
+  }
+
+  @Patch()
+  async update(@Body() body: UpdateLocationDto) {
+    try {
+      await this.locationService.update(body);
+
+      return {
+        success: true,
+        message: 'the location has been updated',
       };
     } catch (error) {
       throw new CustomException(error);

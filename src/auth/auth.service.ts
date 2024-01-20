@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { PrismaService } from 'src/database/prisma.service';
-import { CustomError } from 'src/errors/custom.error';
-import { hash, verify } from 'src/utils/bcrypt.util';
+import { PrismaService } from '../database/prisma.service';
+import { CustomError } from '../errors/custom.error';
+import { hash, verify } from '../utils/bcrypt.util';
 import { LoginDto, RegisterDto } from './auth.dto';
 
 @Injectable()

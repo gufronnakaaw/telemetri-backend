@@ -1,5 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
+import { PrismaService } from '../database/prisma.service';
 import { IotController } from './iot.controller';
 import { IotMiddleware } from './iot.middleware';
 import { IotService } from './iot.service';

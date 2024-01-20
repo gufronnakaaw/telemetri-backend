@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
-import { CustomError } from 'src/errors/custom.error';
-import { CreateLocationDto, DeleteLocationDto } from './location.dto';
+import { PrismaService } from '../database/prisma.service';
+import { CustomError } from '../errors/custom.error';
+import {
+  CreateLocationDto,
+  DeleteLocationDto,
+  UpdateLocationDto,
+} from './location.dto';
 
 @Injectable()
 export class LocationService {
@@ -20,15 +24,34 @@ export class LocationService {
     });
   }
 
-  getDetail(name: string) {
-    return this.prisma.telemetry.findMany({
-      where: {
-        station_name: name,
-      },
-      orderBy: {
-        created_at: 'desc',
-      },
-    });
+  async getDetail(name: string) {
+    const [total_data, data] = await this.prisma.$transaction([
+      this.prisma.telemetry.count({
+        where: {
+          station_name: name,
+        },
+      }),
+      this.prisma.station.findFirst({
+        where: {
+          name,
+        },
+        select: {
+          title: true,
+          status: true,
+          telemetry: {
+            orderBy: {
+              created_at: 'desc',
+            },
+            take: 300,
+          },
+        },
+      }),
+    ]);
+
+    return {
+      total_data,
+      ...data,
+    };
   }
 
   async create(data: CreateLocationDto) {
@@ -72,5 +95,29 @@ export class LocationService {
         },
       }),
     ]);
+  }
+
+  async update(data: UpdateLocationDto) {
+    const id = data.id;
+    const check = await this.prisma.station.count({
+      where: {
+        id,
+      },
+    });
+
+    if (check < 1) {
+      throw new CustomError(404, 'station not found');
+    }
+
+    delete data.id;
+
+    await this.prisma.station.updateMany({
+      where: {
+        id,
+      },
+      data: {
+        ...data,
+      },
+    });
   }
 }
