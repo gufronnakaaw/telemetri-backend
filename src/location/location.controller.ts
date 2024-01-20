@@ -36,11 +36,14 @@ export class LocationController {
   @Get('detail/:name')
   async detailStation(@Param('name') name) {
     try {
-      const data = await this.locationService.getDetail(name);
+      const [total_data, data] = await this.locationService.getDetail(name);
 
       return {
         success: true,
-        data,
+        data: {
+          total_data,
+          ...data,
+        },
       };
     } catch (error) {
       throw new CustomException(error);

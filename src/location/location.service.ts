@@ -24,8 +24,8 @@ export class LocationService {
     });
   }
 
-  async getDetail(name: string) {
-    const [total_data, data] = await this.prisma.$transaction([
+  getDetail(name: string) {
+    return this.prisma.$transaction([
       this.prisma.telemetry.count({
         where: {
           station_name: name,
@@ -42,16 +42,11 @@ export class LocationService {
             orderBy: {
               created_at: 'desc',
             },
-            take: 300,
+            take: 200,
           },
         },
       }),
     ]);
-
-    return {
-      total_data,
-      ...data,
-    };
   }
 
   async create(data: CreateLocationDto) {
