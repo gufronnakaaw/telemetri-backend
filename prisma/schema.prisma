@@ -28,6 +28,7 @@ model Station {
   created_at        DateTime     @default(now())
   
   telemetry         Telemetry[]
+  instrument        Instrument[]
   @@map("stations")
 }
 
@@ -63,6 +64,17 @@ model User {
   created_at        DateTime      @default(now())
 
   @@map("users")
+}
+
+model Instrument {
+  id                Int           @id @default(autoincrement())
+  station_name      String
+  data              Json
+  created_at        DateTime      @default(now())
+
+  station           Station       @relation(fields: [station_name], references: [name])
+
+  @@map("instruments")
 }
 
 enum UserEnum {
