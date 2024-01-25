@@ -6,6 +6,7 @@ export class CreateLocationDto {
   lat: string;
   long: string;
   status: Status;
+  instrument: { name: string; field: string }[];
 }
 
 export class DeleteLocationDto {
@@ -19,4 +20,5 @@ export class UpdateLocationDto {
   lat?: string;
   long?: string;
   status?: Status;
+  instrument?: { name: string; field: string }[];
 }

@@ -38,11 +38,14 @@ export class LocationController {
     try {
       const [total_data, data] = await this.locationService.getDetail(name);
 
+      const { instrument, ...all } = data;
+
       return {
         success: true,
         data: {
           total_data,
-          ...data,
+          ...all,
+          instrument: instrument[0].data,
         },
       };
     } catch (error) {

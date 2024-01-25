@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import { CustomError } from '../errors/custom.error';
 import {
@@ -20,6 +21,11 @@ export class LocationService {
         status: true,
         lat: true,
         long: true,
+        instrument: {
+          select: {
+            data: true,
+          },
+        },
       },
     });
   }
@@ -44,6 +50,11 @@ export class LocationService {
             },
             take: 200,
           },
+          instrument: {
+            select: {
+              data: true,
+            },
+          },
         },
       }),
     ]);
@@ -60,9 +71,18 @@ export class LocationService {
       throw new CustomError(400, 'name already exists');
     }
 
+    const { instrument, ...create } = data;
+
+    instrument as Prisma.JsonArray;
+
     await this.prisma.station.create({
       data: {
-        ...data,
+        ...create,
+        instrument: {
+          create: {
+            data: instrument,
+          },
+        },
       },
     });
   }
@@ -84,6 +104,11 @@ export class LocationService {
           station_name: data.name,
         },
       }),
+      this.prisma.instrument.deleteMany({
+        where: {
+          station_name: data.name,
+        },
+      }),
       this.prisma.station.deleteMany({
         where: {
           name: data.name,
@@ -94,24 +119,40 @@ export class LocationService {
 
   async update(data: UpdateLocationDto) {
     const id = data.id;
-    const check = await this.prisma.station.count({
+    const check = await this.prisma.station.findFirst({
       where: {
         id,
       },
+      select: {
+        name: true,
+      },
     });
 
-    if (check < 1) {
+    if (!check) {
       throw new CustomError(404, 'station not found');
     }
 
     delete data.id;
+    const { instrument, ...all } = data;
 
-    await this.prisma.station.updateMany({
+    instrument as Prisma.JsonArray;
+
+    await this.prisma.station.update({
       where: {
         id,
       },
       data: {
-        ...data,
+        ...all,
+        instrument: {
+          updateMany: {
+            where: {
+              station_name: check.name,
+            },
+            data: {
+              data: instrument,
+            },
+          },
+        },
       },
     });
   }
