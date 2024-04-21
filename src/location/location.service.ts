@@ -30,7 +30,46 @@ export class LocationService {
     });
   }
 
-  getDetail(name: string) {
+  getDetail(name: string, period: string) {
+    if (period) {
+      const date = new Date();
+      date.setHours(date.getHours() - 12);
+
+      return this.prisma.$transaction([
+        this.prisma.telemetry.count({
+          where: {
+            station_name: name,
+          },
+        }),
+        this.prisma.station.findFirst({
+          where: {
+            name,
+          },
+          select: {
+            title: true,
+            status: true,
+            telemetry: {
+              where: {
+                created_at: {
+                  gte: date,
+                  lte: new Date(),
+                },
+              },
+              orderBy: {
+                created_at: 'desc',
+              },
+              take: 500,
+            },
+            instrument: {
+              select: {
+                data: true,
+              },
+            },
+          },
+        }),
+      ]);
+    }
+
     return this.prisma.$transaction([
       this.prisma.telemetry.count({
         where: {
@@ -48,7 +87,7 @@ export class LocationService {
             orderBy: {
               created_at: 'desc',
             },
-            take: 200,
+            take: 250,
           },
           instrument: {
             select: {

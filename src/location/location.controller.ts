@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { CustomException } from '../errors/custom.exception';
 import {
@@ -34,9 +35,15 @@ export class LocationController {
   }
 
   @Get('detail/:name')
-  async detailStation(@Param('name') name) {
+  async detailStation(
+    @Param('name') name: string,
+    @Query('period') period: string,
+  ) {
     try {
-      const [total_data, data] = await this.locationService.getDetail(name);
+      const [total_data, data] = await this.locationService.getDetail(
+        name,
+        period,
+      );
 
       const { instrument, ...all } = data;
 
